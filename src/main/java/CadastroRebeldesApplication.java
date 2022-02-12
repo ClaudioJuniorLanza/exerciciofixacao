@@ -1,19 +1,24 @@
-import br.com.letscode.cadastrorebeldes.CadastroRebeldes;
+import br.com.letscode.cadastrorebeldes.controller.InteligenciaCentral;
+import br.com.letscode.cadastrorebeldes.controller.OrdenacaoController;
+import br.com.letscode.cadastrorebeldes.domain.Rebelde;
+import br.com.letscode.cadastrorebeldes.view.RebeldesView;
 
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public class CadastroRebeldesApplication {
 
     public static void main(String[] args) {
-        CadastroRebeldes cadastroRebeldes = new CadastroRebeldes();
-        try {
-            cadastroRebeldes.cadastroRebelde();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+
+        RebeldesView rebeldesView = new RebeldesView();
+        List<Rebelde> rebeldeList = rebeldesView.cadastroRebelde();
+
+        OrdenacaoController ordenacaoController = new OrdenacaoController();
+        String opcaoOrdenacao = ordenacaoController.tipoDeOrdenacao();
+        List<Rebelde> listaOrdenada = ordenacaoController.executarOrdenacao(rebeldeList, opcaoOrdenacao);
+
+        InteligenciaCentral ic = new InteligenciaCentral();
+        ic.imprimirRebeldesAdmitidos(listaOrdenada);
+
     }
 
 }
