@@ -1,11 +1,14 @@
-package br.com.letscode.cadastrorebeldes.controller;
+package br.com.letscode.cadastrorebeldes.view;
 
+import br.com.letscode.cadastrorebeldes.controller.InteligenciaCentral;
 import br.com.letscode.cadastrorebeldes.domain.Rebelde;
 import br.com.letscode.cadastrorebeldes.enums.TipoRebelde;
+import br.com.letscode.cadastrorebeldes.exceptions.RebeldeNaoCadastradoException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,14 +19,14 @@ import java.util.Set;
 
 @Data
 @Builder
-public class RebeldesController {
+@AllArgsConstructor
+public class RebeldesView {
 
-    public void cadastroRebelde() {
+    public List<Rebelde> cadastroRebelde(){
         InteligenciaCentral ic = new InteligenciaCentral();
         List<Rebelde> rebeldeList = new ArrayList<>();
 
         String respostaContinue = null;
-        String msgParaContinuar = "Deseja adicionar um novo cadastro?";
 
         System.out.println("Bem vindo ao cadastro dos rebeldes!");
 
@@ -32,23 +35,34 @@ public class RebeldesController {
             String racaRebelde = new Scanner(System.in).next();
             if(ic.verificaAceitacaoIC(racaRebelde.toLowerCase())){
                 rebeldeList.add(cadastro(racaRebelde));
-                respostaContinue = continuar(msgParaContinuar);
+                respostaContinue = continuar("Deseja adicionar um novo cadastro?");
             }else{
                 System.out.println("Desculpe, você não foi aceito pra fazer parte da causa");
-                msgParaContinuar = "Deseja tentar novamente o cadastro?";
-                respostaContinue = continuar(msgParaContinuar);
+                respostaContinue = continuar("Deseja tentar novamente o cadastro?");
             }
-            switch (respostaContinue){
+            switch (respostaContinue.toUpperCase()){
                 case "NAO":
-                    ic.imprimirRebeldesAdmitidos(rebeldeList);
-                    break;
+                    try {
+                        return verificaRebeldesCadastrados(rebeldeList);
+                    } catch (RebeldeNaoCadastradoException e) {
+                        e.printStackTrace();
+                    }
+                case "SIM":
+                    continue;
                 default:
                     continue;
             }
         }
     }
 
-    public Rebelde cadastro(String racaRebelde){
+    private List<Rebelde> verificaRebeldesCadastrados(List<Rebelde> rebeldeList) throws RebeldeNaoCadastradoException {
+        if (rebeldeList.isEmpty()){
+            throw new RebeldeNaoCadastradoException("Nenhum rebelde foi cadastrado. Não será possível realizar o registro");
+        }
+        return rebeldeList;
+    }
+
+    private Rebelde cadastro(String racaRebelde){
         Rebelde rebelde = new Rebelde();
         rebelde.setTipoRebelde(TipoRebelde.valueOf(racaRebelde.toUpperCase()));
         System.out.println("Você é um rebelde aceito! Continue seu cadastro");
@@ -68,7 +82,7 @@ public class RebeldesController {
             cadastro(racaRebelde);
         }
 
-        System.out.println("cadastro limpo!");
+        System.out.println("cadastro válido!");
         return rebelde;
     }
 
@@ -80,7 +94,7 @@ public class RebeldesController {
         while(true){
             System.out.println("Digite sua opção:");
             String continuaCadastro = new Scanner(System.in).next();
-            if ("SIM".equals(continuaCadastro) || "NAO".equals(continuaCadastro)){
+            if ("SIM".equals(continuaCadastro.toUpperCase()) || "NAO".equals(continuaCadastro.toUpperCase())){
                 return continuaCadastro;
             }
             System.out.println("Opção inválida. Digite novamenete");
