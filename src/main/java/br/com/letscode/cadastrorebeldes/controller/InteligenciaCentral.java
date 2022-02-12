@@ -19,12 +19,13 @@ public class InteligenciaCentral {
             System.out.println("Tipo de rebelde não existente. Por favor, tente novamente conforme opções apresentadas.");
             return false;
         }
+
         String racaAceitavel = Arrays.asList(values).get(r.nextInt(values.length)).getDescricao();
         System.out.println(racaAceitavel);
         return racaAceitavel.equals(racaRebelde);
     }
 
-    public void imprimirRebeldesAdmitidos(CadastroRebeldes cadastroRebelde) throws FileNotFoundException, UnsupportedEncodingException {
+    public void imprimirRebeldesAdmitidos(RebeldesController cadastroRebelde) throws FileNotFoundException, UnsupportedEncodingException {
         @Cleanup PrintWriter writer = new PrintWriter("lista-admitidos.txt", "UTF-8");
         writer.println("LISTA DOS REBELDES ADMITIDOS");
         writer.println("Nome: " + cadastroRebelde.getNome() + " - "
